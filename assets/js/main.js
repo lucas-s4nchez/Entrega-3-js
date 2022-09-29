@@ -1,8 +1,9 @@
+const contenedor = document.getElementById("contenedor");
 const card = document.getElementById("card");
 const cardNombre = document.getElementById("nombre");
 const cardPrecio = document.getElementById("precio");
 const cardImagen = document.getElementById("imagen");
-const cardIngredientes = document.getElementById("ingredientes");
+
 const form = document.getElementById("form");
 const inputSearch = document.getElementById("search");
 const pizzasGuardadas = JSON.parse(localStorage.getItem("pizzas")) || {};
@@ -80,9 +81,7 @@ const pizzas = [
   },
 ];
 window.addEventListener("DOMContentLoaded", () => {
-  if (!Object.values(pizzasGuardadas).length) {
-    reset();
-  } else {
+  if (Object.values(pizzasGuardadas).length) {
     renderPizza(pizzasGuardadas);
   }
 });
@@ -97,12 +96,10 @@ function enviarId(e) {
   const pizzaId = parseInt(inputSearch.value);
   if (!pizzaId) {
     mostrarAlerta("Elegí un id válido (1-6)");
-    reset();
     return;
   }
   if (pizzaId <= 0 || pizzaId > pizzas.length) {
     mostrarAlerta("Elegí un id válido (1-6)");
-    reset();
     return;
   }
   const resultado = pizzas.find((pizza) => pizza.id === pizzaId);
@@ -112,9 +109,19 @@ function enviarId(e) {
 const renderPizza = (pizza) => {
   limpiarHTML();
   const { id, nombre, precio, imagen, ingredientes } = pizza;
-  cardNombre.textContent = `#${id} ${nombre}`;
-  cardPrecio.textContent = `${precio}`;
-  cardImagen.src = imagen;
+  contenedor.innerHTML += `
+  <div class="card" id="card">
+    <p class="card__nombre text-center font-bold" id="nombre">#${id} ${nombre}</p>
+    <p class="card__precio text-center text-gray" id="precio">${precio}</p>
+    <div class="card__info">
+      <div class="card__imagen">
+        <img id="imagen" src="${imagen}" alt="">
+      </div>
+      <ul class="card__ingredientes" id="ingredientes">✔ Ingredientes: </ul>
+    </div>
+  </div>
+  `;
+  const cardIngredientes = document.getElementById("ingredientes");
   ingredientes.map((ingrediente) => {
     cardIngredientes.innerHTML += `
     <li>${ingrediente}</li>
@@ -132,17 +139,11 @@ const mostrarAlerta = (mensaje) => {
   divAlert.innerHTML = `
     <p>${mensaje}</p>
     `;
-  card.appendChild(divAlert);
+  contenedor.appendChild(divAlert);
   setTimeout(() => {
     divAlert.remove();
   }, 3000);
 };
-const reset = () => {
-  cardNombre.textContent = "";
-  cardPrecio.textContent = "";
-  cardImagen.src = "";
-  limpiarHTML();
-};
 function limpiarHTML() {
-  cardIngredientes.innerHTML = "✔ Ingredientes :";
+  contenedor.innerHTML = "";
 }
